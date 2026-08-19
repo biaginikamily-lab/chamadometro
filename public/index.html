@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>chamadometro</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      background: #b9b9b9;
+      font-family: Tahoma, Verdana, sans-serif;
+      color: #000000;
+      text-align: center;
+      margin: 0;
+      padding: clamp(16px, 5vw, 32px) clamp(12px, 4vw, 16px);
+    }
+    .janela {
+      background: #ece9d8;
+      border: 2px solid #0a4fc4;
+      width: 100%;
+      max-width: 400px;
+      margin: 0 auto;
+      overflow: hidden;
+      box-shadow: 2px 2px 8px rgba(0,0,0,0.35);
+    }
+    .janela.tremendo { animation: tremer 0.4s ease; }
+    @keyframes tremer {
+      0%, 100% { transform: translateX(0); }
+      20% { transform: translateX(-6px) rotate(-1deg); }
+      40% { transform: translateX(6px) rotate(1deg); }
+      60% { transform: translateX(-5px); }
+      80% { transform: translateX(5px); }
+    }
+    .titulo {
+      background: linear-gradient(180deg, #3d95ff 0%, #0058ee 50%, #0a4fc4 100%);
+      color: #ffffff;
+      font-weight: bold;
+      font-size: 13px;
+      padding: 8px 10px;
+      text-align: left;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .fechar {
+      background: linear-gradient(180deg, #ff8f7a, #e42217);
+      color: #ffffff;
+      font-size: 11px;
+      font-weight: bold;
+      border: 1px solid #a01000;
+      width: 20px;
+      height: 18px;
+      line-height: 18px;
+      text-align: center;
+      cursor: pointer;
+      flex-shrink: 0;
+    }
+    .conteudo { padding: clamp(18px, 5vw, 24px) clamp(16px, 5vw, 22px); }
+    h1 {
+      font-family: "Comic Sans MS", cursive;
+      font-size: clamp(24px, 7vw, 28px);
+      color: #ff0000;
+      text-shadow: 1px 1px #ffffff;
+      margin: 0 0 8px;
+    }
+    p { font-size: 14px; color: #333333; margin: 6px 0 16px; }
+    button {
+      font-family: "Comic Sans MS", cursive;
+      font-size: 14px;
+      padding: 12px 18px;
+      margin: 5px;
+      background: linear-gradient(180deg, #ffffff 0%, #ece9d8 100%);
+      color: #000000;
+      border: 1px solid #7f7f7f;
+      cursor: pointer;
+      transition: transform 0.1s;
+      min-height: 44px;
+    }
+    button:hover { transform: scale(1.06) rotate(-1deg); }
+    button:active { background: #d4d0c4; transform: scale(0.96); }
+    #btnAtivar { animation: pulsar 1.6s infinite; }
+    @keyframes pulsar {
+      0%, 100% { box-shadow: 0 0 0 0 rgba(228,34,23,0.5); }
+      50% { box-shadow: 0 0 0 8px rgba(228,34,23,0); }
+    }
+    #btnCancelar { display: none; color: #a01000; border-color: #a01000; }
+    #btnMutar.mutado { background: #d4d0c4; }
+    #status {
+      font-weight: bold;
+      font-family: "Comic Sans MS", cursive;
+      font-size: clamp(15px, 4.5vw, 16px);
+      color: #e42217;
+    }
+    hr { border: none; border-top: 1px solid #c8c4b0; margin: 20px 0; }
+    .contador {
+      font-family: "Courier New", monospace;
+      font-size: 12px;
+      background: #000000;
+      color: #00ff00;
+      display: inline-block;
+      padding: 6px 10px;
+      cursor: pointer;
+    }
+    .rodape { font-size: 11px; color: #555544; margin-top: 20px; padding: 0 8px; }
+    marquee {
+      background: #e42217;
+      color: #ffffff;
+      padding: 7px 0;
+      font-size: 12px;
+      font-weight: bold;
+      font-family: "Comic Sans MS", cursive;
+    }
+    .lista-chamada { margin-top: 16px; text-align: left; }
+    .item-aluno {
+      display: flex;
+      justify-content: space-between;
+      background: #ffffff;
+      border: 1px solid #c8c4b0;
+      padding: 8px 10px;
+      margin-bottom: 6px;
+      font-size: 14px;
+    }
+    .item-aluno.atrasado {
+      background: #ffd6d6;
+      border-color: #e42217;
+      color: #a01000;
+      font-weight: bold;
+    }
+    .item-aluno .tempo { font-family: "Courier New", monospace; }
+    .ranking { margin-top: 16px; text-align: left; font-size: 13px; }
+    .ranking-item {
+      display: flex;
+      justify-content: space-between;
+      padding: 6px 8px;
+      background: #fff7d9;
+      border: 1px solid #e0c060;
+      margin-bottom: 4px;
+    }
+  </style>
+</head>
+<body>
+
+  <marquee>bem vindo ao chamadometro (o melhor jeito de chamar o povo p sala) ;p</marquee>
+
+  <div class="janela" id="janela">
+    <div class="titulo">
+      chamadometro.exe
+      <span class="fechar" onclick="alert('nao da pra fechar bicho, a chamada eh a vida')">x</span>
+    </div>
+
+    <div class="conteudo">
+      <div id="telaEscolha">
+        <h1>chamadometro</h1>
+        <p>escolhe sua turma</p>
+        <button onclick="entrarNaTurma('NA')">turma NA</button>
+        <button onclick="entrarNaTurma('NB')">turma NB</button>
+      </div>
+
+      <div id="telaPrincipal" style="display:none">
+        <h1>chamadometro</h1>
+        <p id="turmaLabel"></p>
+        <button id="btnAtivar">ativar sinal</button>
+        <button id="btnCancelar">cancelar sinal</button>
+        <button id="btnMutar">mutar</button>
+        <button id="btnTrocar">trocar turma</button>
+        <p id="status">aguardando...</p>
+
+<div class="lista-chamada" id="listaChamada" style="display:none"></div>
+             <div id="blocoRanking" style="display:none">
+          <hr>
+          <p style="font-weight:bold; margin-bottom:6px;">ranking de atrasos</p>
+          <div class="ranking" id="ranking"></div>
+        </div>
+      </div>
+
+      <hr>
+      <div class="contador" id="contadorVisitas" title="clica aqui, eu sei que voce quer">visitantes: 000001</div>
+    </div>
+  </div>
+
+  <p class="rodape">site melhor visualizado em 800x600 - nao ligar celular no som alto perto de gente estudando</p>
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script>
+    const socket = io();
+
+    const telaEscolha = document.getElementById('telaEscolha');
+    const telaPrincipal = document.getElementById('telaPrincipal');
+    const turmaLabel = document.getElementById('turmaLabel');
+    const botao = document.getElementById('btnAtivar');
+    const btnCancelar = document.getElementById('btnCancelar');
+    const btnMutar = document.getElementById('btnMutar');
+    const btnTrocar = document.getElementById('btnTrocar');
+    const status = document.getElementById('status');
+    const janela = document.getElementById('janela');
+    const listaChamada = document.getElementById('listaChamada');
+    const rankingDiv = document.getElementById('ranking');
+
+    const listasPorSala = {
+      NA: ["bia", "lucas", "carlos haas"],
+      NB: ["yasmin", "theo", "carol"],
+      geral: ["bia", "lucas", "carlos haas", "yasmin", "theo", "carol"]
+    };
+
+    let salaAtual = null;
+    let mutado = false;
+    let temposRestantes = {};
+    let jaContadoNessaChamada = new Set();
+    let intervaloChamada = null;
+
+    const tituloOriginal = document.title;
+    let intervaloPiscar = null;
+
+    function comecarPiscar() {
+      if (intervaloPiscar || document.hasFocus()) return;
+      let mostrandoAlerta = false;
+      intervaloPiscar = setInterval(() => {
+        document.title = mostrandoAlerta ? tituloOriginal : 'sinal!';
+        mostrandoAlerta = !mostrandoAlerta;
+      }, 600);
+    }
+
+    function pararPiscar() {
+      clearInterval(intervaloPiscar);
+      intervaloPiscar = null;
+      document.title = tituloOriginal;
+    }
+
+    window.addEventListener('focus', pararPiscar);
+    document.addEventListener('visibilitychange', () => {
+      if (!document.hidden) pararPiscar();
+    });
+
+    function entrarNaTurma(turma) {
+      socket.emit('entrar', turma);
+    }
+
+    socket.on('infoSala', ({ sala, diaJunto }) => {
+      salaAtual = sala;
+      turmaLabel.textContent = 'sala: ' + sala.toLowerCase();
+      telaEscolha.style.display = 'none';
+      telaPrincipal.style.display = 'block';
+      btnTrocar.style.display = diaJunto ? 'none' : 'inline-block';
+      atualizarRanking();
+    });
+
+    function beep() {
+      if (mutado) return;
+      try {
+        const ctx = new (window.AudioContext || window.webkitAudioContext)();
+        const o = ctx.createOscillator();
+        const g = ctx.createGain();
+        o.type = 'square';
+        o.frequency.value = 740;
+        g.gain.value = 0.05;
+        o.connect(g); g.connect(ctx.destination);
+        o.start();
+        o.frequency.linearRampToValueAtTime(920, ctx.currentTime + 0.15);
+        g.gain.linearRampToValueAtTime(0, ctx.currentTime + 0.3);
+        o.stop(ctx.currentTime + 0.3);
+      } catch(e) {}
+    }
+
+    function vibrar() {
+      if (mutado) return;
+      if (navigator.vibrate) navigator.vibrate([200,100,200]);
+    }
+
+    function montarLista() {
+      const nomes = listasPorSala[salaAtual] || [];
+      listaChamada.innerHTML = '';
+      temposRestantes = {};
+      jaContadoNessaChamada = new Set();
+      nomes.forEach((nome, i) => {
+        const inicio = 30 - i * 3;
+        temposRestantes[nome] = inicio < 0 ? 0 : inicio;
+        const linha = document.createElement('div');
+        linha.className = 'item-aluno';
+        linha.id = 'aluno-' + i;
+        linha.innerHTML = `<span>${nome}</span><span class="tempo">${temposRestantes[nome]}s</span>`;
+        listaChamada.appendChild(linha);
+      });
+    }
+
+    function registrarFalta(nome) {
+      const ranking = JSON.parse(localStorage.getItem('rankingFaltas') || '{}');
+      ranking[nome] = (ranking[nome] || 0) + 1;
+      localStorage.setItem('rankingFaltas', JSON.stringify(ranking));
+    }
+
+    function atualizarLista() {
+      const nomes = listasPorSala[salaAtual] || [];
+      let terminou = true;
+      nomes.forEach((nome, i) => {
+        if (temposRestantes[nome] > 0) {
+          temposRestantes[nome] = Math.max(0, temposRestantes[nome] - 3);
+          terminou = false;
+        }
+        const linha = document.getElementById('aluno-' + i);
+        linha.querySelector('.tempo').textContent = temposRestantes[nome] + 's';
+        if (temposRestantes[nome] === 0 && !jaContadoNessaChamada.has(nome)) {
+          linha.classList.add('atrasado');
+          jaContadoNessaChamada.add(nome);
+          registrarFalta(nome);
+        }
+      });
+      if (terminou) {
+        clearInterval(intervaloChamada);
+        atualizarRanking();
+      }
+    }
+
+    function atualizarRanking() {
+      const ranking = JSON.parse(localStorage.getItem('rankingFaltas') || '{}');
+      const nomesDaSala = listasPorSala[salaAtual] || [];
+      const entradas = Object.entries(ranking)
+        .filter(([nome]) => nomesDaSala.includes(nome))
+        .sort((a, b) => b[1] - a[1]);
+
+      rankingDiv.innerHTML = '';
+      if (entradas.length === 0) {
+        rankingDiv.innerHTML = '<p style="color:#777;">ninguem atrasou ainda, milagre</p>';
+        return;
+      }
+      entradas.forEach(([nome, qtd]) => {
+        const linha = document.createElement('div');
+        linha.className = 'ranking-item';
+        linha.innerHTML = `<span>${nome}</span><span>${qtd}x</span>`;
+        rankingDiv.appendChild(linha);
+      });
+    }
+
+    function dispararEfeitos() {
+      beep();
+      janela.classList.add('tremendo');
+      vibrar();
+      setTimeout(() => janela.classList.remove('tremendo'), 400);
+
+      clearInterval(intervaloChamada);
+      montarLista();
+      intervaloChamada = setInterval(atualizarLista, 3000);
+
+      btnCancelar.style.display = 'inline-block';
+    }
+
+    function resetarEstado() {
+      clearInterval(intervaloChamada);
+      status.textContent = 'aguardando...';
+      listaChamada.innerHTML = '';
+      btnCancelar.style.display = 'none';
+      pararPiscar();
+    }
+
+    botao.addEventListener('click', () => {
+      socket.emit('ativarSinal');
+      status.textContent = 'enviado';
+      dispararEfeitos();
+    });
+
+    btnCancelar.addEventListener('click', () => {
+      socket.emit('cancelarSinal');
+    });
+
+    btnMutar.addEventListener('click', () => {
+      mutado = !mutado;
+      btnMutar.textContent = mutado ? 'desmutar' : 'mutar';
+      btnMutar.classList.toggle('mutado', mutado);
+    });
+
+    btnTrocar.addEventListener('click', () => {
+      resetarEstado();
+      telaPrincipal.style.display = 'none';
+      telaEscolha.style.display = 'block';
+    });
+
+    socket.on('sinalRecebido', () => {
+      status.textContent = 'sinal recebido, corre!!';
+      dispararEfeitos();
+      comecarPiscar();
+    });
+
+    socket.on('sinalCancelado', () => {
+      resetarEstado();
+    });
+
+    let visitas = parseInt(localStorage.getItem('visitas') || '0') + 1;
+    localStorage.setItem('visitas', visitas);
+    document.getElementById('contadorVisitas').textContent =
+      'visitantes: ' + String(visitas).padStart(6, '0');
+  </script>
+</body>
+</html>
