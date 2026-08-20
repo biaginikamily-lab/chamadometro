@@ -55,6 +55,9 @@ function notificarSala(sala) {
 
 io.on('connection', (socket) => {
   console.log('alguem conectou:', socket.id);
+    const hoje = new Date().getDay();
+  const diaJunto = [2, 4].includes(hoje);
+  socket.emit('diaDeHoje', { diaJunto });
 
   socket.on('entrar', (turma) => {
     if (socket.salaAtual) {

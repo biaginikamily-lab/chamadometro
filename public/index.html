@@ -161,11 +161,16 @@
     </div>
 
     <div class="conteudo">
-      <div id="telaEscolha">
+            <div id="telaEscolha" style="display:none">
         <h1>chamadometro</h1>
         <p>escolhe sua turma</p>
-      <button onclick="entrarNaTurma('NA')">turma na</button>
+        <button onclick="entrarNaTurma('NA')">turma na</button>
         <button onclick="entrarNaTurma('NB')">turma nb</button>
+      </div>
+
+      <div id="telaCarregando">
+        <h1>chamadometro</h1>
+        <p>carregando...</p>
       </div>
 
       <div id="telaPrincipal" style="display:none">
@@ -180,11 +185,7 @@
 
         <div class="lista-chamada" id="listaChamada"></div>
 
-        <div id="blocoRanking">
-          <hr>
-          <p style="font-weight:bold; margin-bottom:6px;">ranking de atrasos</p>
-          <div class="ranking" id="ranking"></div>
-        </div>
+      
       </div>
 
       <hr>
@@ -236,7 +237,6 @@
     const status = document.getElementById('status');
     const janela = document.getElementById('janela');
     const listaChamada = document.getElementById('listaChamada');
-    const rankingDiv = document.getElementById('ranking');
     const avisoPush = document.getElementById('avisoPush');
 
         const listasPorSala = {
@@ -321,6 +321,16 @@
     function entrarNaTurma(turma) {
       socket.emit('entrar', turma);
     }
+        const telaCarregando = document.getElementById('telaCarregando');
+
+    socket.on('diaDeHoje', ({ diaJunto }) => {
+      telaCarregando.style.display = 'none';
+      if (diaJunto) {
+        socket.emit('entrar', 'geral');
+      } else {
+        telaEscolha.style.display = 'block';
+      }
+    });
 
     // converte a chave publica pro formato que o navegador exige
     function urlBase64ToUint8Array(base64String) {
@@ -364,7 +374,7 @@
       telaEscolha.style.display = 'none';
       telaPrincipal.style.display = 'block';
       btnTrocar.style.display = diaJunto ? 'none' : 'inline-block';
-      atualizarRanking();
+  
       ativarNotificacoes();
     });
 
@@ -402,9 +412,9 @@
       listaChamada.innerHTML = '';
       temposRestantes = {};
       jaContadoNessaChamada = new Set();
-      nomes.forEach((nome, i) => {
-        const inicio = 30 - i * 3;
-        temposRestantes[nome] = inicio < 0 ? 0 : inicio;
+            nomes.forEach((nome, i) => {
+        const inicio = (i + 1) * 3;
+        temposRestantes[nome] = inicio;
         const linha = document.createElement('div');
         linha.className = 'item-aluno';
         linha.id = 'aluno-' + i;
@@ -413,11 +423,6 @@
       });
     }
 
-    function registrarFalta(nome) {
-      const ranking = JSON.parse(localStorage.getItem('rankingFaltas') || '{}');
-      ranking[nome] = (ranking[nome] || 0) + 1;
-      localStorage.setItem('rankingFaltas', JSON.stringify(ranking));
-    }
 
     function atualizarLista() {
       const nomes = listasPorSala[salaAtual] || [];
@@ -429,37 +434,17 @@
         }
         const linha = document.getElementById('aluno-' + i);
         linha.querySelector('.tempo').textContent = temposRestantes[nome] + 's';
-        if (temposRestantes[nome] === 0 && !jaContadoNessaChamada.has(nome)) {
+               if (temposRestantes[nome] === 0 && !jaContadoNessaChamada.has(nome)) {
           linha.classList.add('atrasado');
           jaContadoNessaChamada.add(nome);
-          registrarFalta(nome);
         }
       });
       if (terminou) {
         clearInterval(intervaloChamada);
-        atualizarRanking();
       }
     }
 
-    function atualizarRanking() {
-      const ranking = JSON.parse(localStorage.getItem('rankingFaltas') || '{}');
-      const nomesDaSala = listasPorSala[salaAtual] || [];
-      const entradas = Object.entries(ranking)
-        .filter(([nome]) => nomesDaSala.includes(nome))
-        .sort((a, b) => b[1] - a[1]);
 
-      rankingDiv.innerHTML = '';
-      if (entradas.length === 0) {
-        rankingDiv.innerHTML = '<p style="color:#777;">ninguem atrasou ainda, milagre</p>';
-        return;
-      }
-      entradas.forEach(([nome, qtd]) => {
-        const linha = document.createElement('div');
-        linha.className = 'ranking-item';
-        linha.innerHTML = `<span>${nome}</span><span>${qtd}x</span>`;
-        rankingDiv.appendChild(linha);
-      });
-    }
 
     function dispararEfeitos() {
       beep();
