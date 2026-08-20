@@ -157,15 +157,15 @@
   <div class="janela" id="janela">
     <div class="titulo">
       chamadometro.exe
-      <<span class="fechar" id="btnFechar" onclick="tentarFechar()">x</span>
+      <span class="fechar" id="btnFechar" onclick="tentarFechar()">x</span>
     </div>
 
     <div class="conteudo">
       <div id="telaEscolha">
         <h1>chamadometro</h1>
         <p>escolhe sua turma</p>
-        <button onclick="entrarNaTurma('na')">turma na</button>
-        <button onclick="entrarNaTurma('nb')">turma nb</button>
+      <button onclick="entrarNaTurma('NA')">turma na</button>
+        <button onclick="entrarNaTurma('NB')">turma nb</button>
       </div>
 
       <div id="telaPrincipal" style="display:none">
@@ -178,9 +178,9 @@
         <p id="status">aguardando...</p>
         <p id="avisoPush"></p>
 
-        <div class="lista-chamada" id="listaChamada" style="display:none"></div>
+        <div class="lista-chamada" id="listaChamada"></div>
 
-        <div id="blocoRanking" style="display:none">
+        <div id="blocoRanking">
           <hr>
           <p style="font-weight:bold; margin-bottom:6px;">ranking de atrasos</p>
           <div class="ranking" id="ranking"></div>
@@ -239,10 +239,54 @@
     const rankingDiv = document.getElementById('ranking');
     const avisoPush = document.getElementById('avisoPush');
 
-    const listasPorSala = {
-      NA: ["bia", "lucas", "carlos haas"],
-      NB: ["yasmin", "theo", "carol"],
-      geral: ["bia", "lucas", "carlos haas", "yasmin", "theo", "carol"]
+        const listasPorSala = {
+      NA: [],
+      NB: [],
+      geral: [
+        "adrian juan lara da silva",
+        "allan kwiatkowski thomazini",
+        "anna carolina strack haus",
+        "carlos eduardo hass franco",
+        "carlos eliezer dos s dias",
+        "davi augusto caldas",
+        "davi szeremeta da cruz",
+        "eduardo parize",
+        "felipe brandes",
+        "fernanda niedzwiedki",
+        "flavio ribeiro dos santos",
+        "francisco galvao coloda",
+        "gabriel eduardo beck paes",
+        "gabriel martins",
+        "giovanna rafaela leoncio torres pereira",
+        "giulia victoria vante ovando pedroso",
+        "huehuller glehyson da silva veine",
+        "igor fernando ferreira dos santos",
+        "leonardo de almeida ribas",
+        "lucas emanuel gavet maichak",
+        "lucas murilo martins blens",
+        "lucas sassi de souza",
+        "lucas soares lillo del pozo",
+        "luis felipe da rosa teixeira",
+        "luiz francisco hellman",
+        "luiz gabriel merotto de lima",
+        "luiz gustavo da silva correa",
+        "manuella das neves bottega",
+        "marco aurelio moro filho",
+        "maria clara nascimento candiotto",
+        "nicolas de antoni mendes",
+        "nicollas lian lima dos santos",
+        "otavio de quadros sonnenstrahl",
+        "pedro henrique brandao pereira",
+        "pedro henrique brecailo czochra",
+        "pedro paulo woytichoski neto",
+        "pietro tani morais strimber",
+        "rhaynan oliveira antunes",
+        "sandyele severo",
+        "vanderson soares de lima junior",
+        "vinicius ribas bida",
+        "vitor eduardo silva",
+        "vitor inacio borges"
+      ]
     };
 
     let salaAtual = null;
