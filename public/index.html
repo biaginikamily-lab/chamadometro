@@ -57,6 +57,11 @@
       cursor: pointer;
       flex-shrink: 0;
     }
+        .fechar.fugindo {
+      position: fixed;
+      z-index: 999;
+    }
+
     .conteudo { padding: clamp(18px, 5vw, 24px) clamp(16px, 5vw, 22px); }
     h1 {
       font-family: "Comic Neue", "Comic Sans MS", cursive;
@@ -152,7 +157,7 @@
   <div class="janela" id="janela">
     <div class="titulo">
       chamadometro.exe
-      <span class="fechar" onclick="alert('nao da pra fechar bicho, a chamada eh a vida')">x</span>
+      <<span class="fechar" id="btnFechar" onclick="tentarFechar()">x</span>
     </div>
 
     <div class="conteudo">
@@ -192,7 +197,33 @@
   <script src="/socket.io/socket.io.js"></script>
   <script>
     const socket = io();
+    const mensagensFechar = [
+      'nao da pra fechar bicho, a chamada eh a vida',
+      'insistente hein. ainda nao',
+      'olha eu entendo a vontade, mas nao',
+      'voce clica mas ele nao fecha, aceita',
+      'voce si odeia?',
+      'ok eu admiro sua persistencia mas NAO',
+      'ta preso aqui pra sempre agora'
+    ];
+    let cliquesFechar = 0;
+    const btnFechar = document.getElementById('btnFechar');
 
+    function tentarFechar() {
+      const indice = Math.min(cliquesFechar, mensagensFechar.length - 1);
+      alert(mensagensFechar[indice]);
+      cliquesFechar++;
+
+      btnFechar.classList.add('fugindo');
+      const largura = btnFechar.offsetWidth;
+      const altura = btnFechar.offsetHeight;
+      const maxX = window.innerWidth - largura - 10;
+      const maxY = window.innerHeight - altura - 10;
+      const novoX = Math.floor(Math.random() * maxX) + 5;
+      const novoY = Math.floor(Math.random() * maxY) + 5;
+      btnFechar.style.left = novoX + 'px';
+      btnFechar.style.top = novoY + 'px';
+    }
     const VAPID_PUBLIC_KEY = 'BKgID1NWTC_kovQ6NS2j_ibJIoKUp1fiS1qexpwT1nKD0L9-kMLzHymj26cjSHSm2kdFmPTFzZEaf_2QZyr2xZw';
 
     const telaEscolha = document.getElementById('telaEscolha');
@@ -293,20 +324,27 @@
       ativarNotificacoes();
     });
 
+       let audioCtx = null;
+
     function beep() {
       if (mutado) return;
       try {
-        const ctx = new (window.AudioContext || window.webkitAudioContext)();
-        const o = ctx.createOscillator();
-        const g = ctx.createGain();
+        if (!audioCtx) {
+          audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        }
+        if (audioCtx.state === 'suspended') {
+          audioCtx.resume();
+        }
+        const o = audioCtx.createOscillator();
+        const g = audioCtx.createGain();
         o.type = 'square';
         o.frequency.value = 740;
         g.gain.value = 0.05;
-        o.connect(g); g.connect(ctx.destination);
+        o.connect(g); g.connect(audioCtx.destination);
         o.start();
-        o.frequency.linearRampToValueAtTime(920, ctx.currentTime + 0.15);
-        g.gain.linearRampToValueAtTime(0, ctx.currentTime + 0.3);
-        o.stop(ctx.currentTime + 0.3);
+        o.frequency.linearRampToValueAtTime(920, audioCtx.currentTime + 0.15);
+        g.gain.linearRampToValueAtTime(0, audioCtx.currentTime + 0.3);
+        o.stop(audioCtx.currentTime + 0.3);
       } catch(e) {}
     }
 
